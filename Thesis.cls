@@ -222,8 +222,8 @@
                 {RESEARCH GROUP NAME (IN BLOCK CAPITALS)}}
 %-------------------------------------------------                
 \faculty{\texorpdfstring{\href{Faculty Web Site URL Here (include http://)} % Your faculty's URL
-                {Faculty Name}} % Your faculty's name - this is currently used in the abstract page
-                {Faculty Name}}
+                {}} % Your faculty's name - this is currently used in the abstract page
+                {}}
 %-------------------------------------------------                
 \FACULTY{\texorpdfstring{\href{Faculty Web Site URL Here (include http://)} % Your faculty's URL
                 {FACULTY NAME (IN BLOCK CAPITALS)}} % Your faculty's name in capitals - this is not currently used anywhere in the template, cite it with \FACNAME if you want it
@@ -299,7 +299,6 @@
     \bigskip
     {\huge{\textit{Abstract}} \par}
     \bigskip
-    {\normalsize \facname \par} % Faculty name
     {\normalsize \deptname \par} % Department name
     \bigskip
     {\normalsize \degreename\par} % Degree name
