@@ -20,45 +20,46 @@ Warning--empty year in ticketlp
 Warning--empty year in introsdp
 Warning--empty year in cvxoptsdp
 Warning--empty year in ticketmatrix
-You've used 19 entries,
+Warning--empty year in ticketsdp
+You've used 20 entries,
             2481 wiz_defined-function locations,
-            633 strings with 7197 characters,
-and the built_in function-call counts, 4839 in all, are:
-= -- 460
+            637 strings with 7326 characters,
+and the built_in function-call counts, 5065 in all, are:
+= -- 482
 > -- 59
 < -- 7
-+ -- 59
++ -- 62
 - -- 16
-* -- 259
-:= -- 582
-add.period$ -- 62
-call.type$ -- 19
-change.case$ -- 38
+* -- 272
+:= -- 604
+add.period$ -- 65
+call.type$ -- 20
+change.case$ -- 40
 chr.to.int$ -- 14
-cite$ -- 48
-duplicate$ -- 294
-empty$ -- 611
+cite$ -- 51
+duplicate$ -- 308
+empty$ -- 643
 format.name$ -- 27
-if$ -- 1140
-int.to.chr$ -- 6
-int.to.str$ -- 20
+if$ -- 1195
+int.to.chr$ -- 7
+int.to.str$ -- 21
 missing$ -- 5
-newline$ -- 107
+newline$ -- 112
 num.names$ -- 15
-pop$ -- 268
+pop$ -- 283
 preamble$ -- 1
-purify$ -- 19
+purify$ -- 20
 quote$ -- 0
-skip$ -- 164
+skip$ -- 171
 stack$ -- 0
-substring$ -- 84
-swap$ -- 57
+substring$ -- 87
+swap$ -- 60
 text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 127
-warning$ -- 15
+type$ -- 134
+warning$ -- 16
 while$ -- 13
 width$ -- 0
-write$ -- 241
-(There were 16 warnings)
+write$ -- 253
+(There were 17 warnings)
