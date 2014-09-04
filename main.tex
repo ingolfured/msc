@@ -108,11 +108,22 @@
 
 \abstract{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
 
-The present Master’s thesis seeks to explain the design and implementation of a Semidefinite Programming interface for Sage.
-The aim was to create an interface which can deal with optimization problems with polynomial constraints, using SDP relaxations.
-An essential step was taken in that direction by first writing a linear programming backend, fully capable of solving various linear programs, and then designing and implementing a Semidefinite Programming interface. 
-The final version of the SDP interface was capable of solving various different kinds of SDP with at least two independent solvers which the user can choose from. Future developers should also find it easy to add new backends for other SDP solvers.
+Sagemath (also known as Sage) is a large-scale open-source Python-based computer algebra/numerics toolbox
+which provides a seamless interface between various open-source computer algebra and numerics systems,
+such as GAP, Maxima, Singular, PARI/GP, numpy, scipy, etc. It is gaining in popularity in the research community
+as an open-source alternative for Mathematica, Maple, Magma, and Matlab.
+Semidefinite Programming (SDP) problems are a novel class of problems in convex optimisation, which properly contain
+such well-known problems as Linear Programming (LP), Convex Quadratic Programming, etc, and
+is a very powerful modelling tool in discrete optimisation, control theory, polynomial optimisation, etc.
 
+The present MSc thesis seeks to explain the design and implementation of an SDP interface for Sage, 
+which constituted most of my MSc project, and provide the necessary mathematical and CS background.
+The meta-aim was to create an interface which can deal with optimization problems with polynomial constraints, using SDP relaxations.
+An essential step was taken by this project in that direction by first writing an LP backend, fully capable of solving various LPs, and then designing and implementing an SDP interface. 
+The final version of the SDP interface is capable of solving different kinds of SDPs using at least two independent solvers, which the user can choose. Future developers should also find it easy to add new backends for other SDP solvers.
+
+Parts of the code written are already accepted into the main development branch of Sage, and will appear in the 
+upcoming release; the remaining code will be merged there in due course, upon passing the review process.
 
 
 
