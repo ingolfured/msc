@@ -1,0 +1,534 @@
+% Chapter 2
+
+\chapter{The CVXOPT LP Backend} % Main chapter title
+
+\label{Chapter2} % For referencing the chapter elsewhere, use \ref{Chapter1} 
+
+\lhead{Chapter 2. CVXOPT linear backend} % This is for the header on each page - perhaps a shortened title
+
+%----------------------------------------------------------------------------------------
+
+\section{Overview}
+SDP is an extension of LP since every LP can be expressed as an SDP. Hence it was wise to design and implement an LP backend solvers first. We created a backend for the LP solver which was based on the open-source cvxopt solver. Not only was it important for the community to have access to this solver but part of the code could be used for the Semidefinite Programming part. Addition of this backend increases the number of different LP solver backends available in Sage to six.
+
+\section{Solving linear Programs in Sage}
+\label{solvelp}
+Sage is capable of solving many different kinds of mathematical problems, in particular, LPs. We assume user wants to solve the following problem:
+\begin{align}
+\text{Max: } & x + y + 3z\\
+\text{Such that: } & x + 2y \leq 4\\
+\text{} & 5z - y \leq 8\\
+\text{} & x,y,z \geq 0
+\end{align}
+To solve it, we need to instantiate the MILP class (stands for MixedIntegerLinearProgram) to create an object $p$, use $p$ to create 3 variables $x$, $y$ and $z$, set the objective, add the constraints and finally call the solve method. The code is mostly self-explanatory:
+
+\begin{verbatim}
+sage: p = MixedIntegerLinearProgram(solver="GLPK")
+sage: v = p.new_variable(real=True, nonnegative=True)
+sage: x, y, z = v['x'], v['y'], v['z']
+sage: p.set_objective(x + y + 3*z)
+sage: p.add_constraint(x + 2*y <= 4)
+sage: p.add_constraint(5*z - y <= 8)
+sage: p.solve()
+8.8
+\end{verbatim}
+which means that $x + y -3z$ is at maximum 8.8 for the constraint defined above. 
+
+Notice that when we create the object $p$ we pick a solver by setting the $solver$ argument. In this case we picked the GLPK solver. However, our goal was to write a backend for the CVXOPT solver so one can use the CVXOPT solver to solve the linear program by defining the MILP object, $p$, in the following way:
+\begin{verbatim}
+sage: p = MixedIntegerLinearProgram(solver="CVXOPT")
+\end{verbatim}
+
+To create a CVXOPT backend it is important to understand how to use the CVXOPT solver.
+
+
+
+\section{LP example using CVXOPT}
+Let's take an example on how the CVXOPT LP solver works. Let's say we have the following linear program:
+\begin{align}
+\text{Minimize: }  &-4x_1 - 5x_2\\
+\text{Subject to: }  &2x_1 + x_2 \leq 3 \\
+&x_1 + 2x_2 \leq 3 \\
+&x_1 \geq 0, \quad x_2 \geq 0 
+\end{align}
+
+
+
+Assuming we have set up the CVXOPT library the correct way, we can use the LP solver of the CVXOPT library to solve the problem above in the following way:
+
+\begin{verbatim}
+>>> from cvxopt import matrix, solvers
+>>> c = matrix([-4., -5.])
+>>> G = matrix([[2., 1., -1., 0.], [1., 2., 0., -1.]])
+>>> h = matrix([3., 3., 0., 0.])
+>>> sol = solvers.lp(c, G, h)
+>>> print(sol['x'])
+[ 1.00e+00]
+[ 1.00e+00]
+\end{verbatim} 
+
+This means the expression $-4x_1 -5x_2$ takes the lowest value when $x_1 \approx 1$ and $x_2 \approx 1$ so we get $-4(1) + -5(1) \approx -9$ \cite{cvxoptuser}.
+
+
+\section{The importance of the CVXOPT solver}
+Sage already has 5 LP solvers backends implemented. However, they are all based on the Simplex method, making them very different from the CVXOPT solver which is based on the interior point method.
+
+
+\subsection{The difference between the Simplex method and interior point method}
+The Simplex method is based on the fact that the objective function's maximum or minimum must occur in an extreme point of the region cut out by the linear constraints. 
+The Simplex method is a remarkable algorithm and was for instance chosen as one of the top 10 algorithm of the twentieth century by the journal Computing in Science and Engineering \cite{top10}.
+
+
+From the beginning of 1990s until now, interior point algorithms have dominated the research on convex optimization problems. Their popularity is mostly based on the fact they reach a high accurate solution in a small number of iterations (from 10 to 50), almost independent of problem size and type \cite{interior}.
+
+
+The main difference between those two methods is that the interior point method, which CVXOPT is based on, runs in polynomial time \cite{simplexpoly}, while the Simplex method, which the rest of the solvers backends are based on, are not know to be able to do so. However, in practice, some LP problems are solved significantly faster with one type of solver. Thus it is important for the user to be able to select between solvers of both types, making the CVXOPT solver very important in practice since it is the only solver in Sage based on interior point method \cite{wikilinear}.
+
+Another important difference between those two methods is that the interior point based solvers return an interior point of the optimal face as an optimal solution, rather than returning a vertex solution. This often gives a more desirable solution since sometimes the user wants to average over the optimal face. The following  example should give an idea what we mean. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lets say we have the following linear program:
+\begin{align}
+\text{Max: } & z\\
+\text{Such that: } & x \leq 100\\
+\text{} & y \leq 100\\
+\text{} & z \leq 100\\
+\text{} & x,y,z \geq 0
+\end{align}
+
+The reader should find it pretty obvious that the solution is of course $z=100$. However, what happens to $x$ and $y$? 
+Since the Simplex based solvers pick a vertex solution, it simply leaves the $x$ and $y$ as 0. However, the interior point solvers, such as CVXOPT, gives an interior point of the optimal face and therefore the $x$ and $y$ get the value 50 which might be a more meaningful solution since it is the average of 100 and 0, that is  $\frac{(100-0)}{2}=50$. The example would look something like this when solved using Sage. First we use the default GLPK solver, which is a Simplex method based solver:
+
+\begin{verbatim}
+            sage: p = MixedIntegerLinearProgram(solver = "GLPK")
+            sage: x = p.new_variable(nonnegative=True)
+            sage: p.set_objective(x[2])
+            sage: #we create a constraint cube
+            sage: p.add_constraint(x[0] <= 100)
+            sage: p.add_constraint(x[1] <= 100)
+            sage: p.add_constraint(x[2] <= 100)
+            sage: round(p.solve(),2)
+            100.0
+            sage: round(p.get_values(x[0]),2)
+            0.0
+            sage: round(p.get_values(x[1]),2)
+            0.0
+\end{verbatim} 
+
+As we expected, we get  0.0 in both cases. Let us run the same code. However, this time we pick CVXOPT as the solver. We get:
+
+\begin{verbatim}
+            sage: p = MixedIntegerLinearProgram(solver = "cvxopt")
+            sage: x = p.new_variable(nonnegative=True)
+            sage: p.set_objective(x[2])
+            sage: #we create a constraint cube
+            sage: p.add_constraint(x[0] <= 100)
+            sage: p.add_constraint(x[1] <= 100)
+            sage: p.add_constraint(x[2] <= 100)
+            sage: round(p.solve(),2)
+            100.0
+            sage: round(p.get_values(x[0]),2)
+            50.0
+            sage: round(p.get_values(x[1]),2)
+            50.0
+\end{verbatim}
+
+Here the $x$ and the $y$ get the value 50.0 as expected. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Parameters for the \texttt{cvxopt.solvers.lp} method}
+\label{lppara}
+The \texttt{cvxopt.solvers.lp(c, G, h[, A, b[, solver[, primalstart[, dualstart]]]])} is the method that solves the linear program from Section \ref{lp}. As we can tell from the declaration, there are three parameters we must provide $c$, $G$ and $h$.
+First one is $c$ which is the coefficients of the objective function. The next one is $G$ which is the coefficients of the matrix $A$ in Section \ref{lp} and at last the $h$ is the $b$ in the same section.
+
+\section{Important classes for the CVXOPT backend}
+ Before we begin describing the implementation of the CVXOPT backend, it is important to have a good understanding on some of the classes the CVXOPT backend talks to. There are two classes worth to mention. The \textit{MixedIntegerLinearProgram} (MILP) class and the \textit{GenericBackend} class.
+ 
+ 
+ \subsection{The MixedIntegerLinearProgram class}
+Let's look at how the LP interface is implemented in Sage. 
+ 
+ 
+The  \textit{MixedIntegerLinearProgram} (MILP) class (the LP interface class) is approximately 2300 lines where each method is fully documented and unit tested. The basic usage of the class is described in section \ref{solvelp}. It's importnant to understand how it works since it is responsible for passing the linear program, provided by the user, to the backend to be solved.   Table \ref{table:mip} lists all the function and a small description of each of the function.
+
+\begin{table}
+    \caption{MixedIntegerLinearProgram's methods table}
+\label{table:mip}
+
+\begin{center}
+  \begin{tabular}{ | l |  l |}
+    \hline
+Function name& Description of its functionality\\
+    \hline    
+\texttt{add\_constraint}&             Adds a constraint to the ``MixedIntegerLinearProgram`` \\ 
+\texttt{base\_ring}&                  Return the base ring\\
+\texttt{constraints}&                Returns a list of constraints, as 3-tuples\\
+\texttt{get\_backend}&                Returns the backend instance used\\
+\texttt{get\_max}&                    Returns the maximum value of a variable\\
+\texttt{get\_min}&                    Returns the minimum value of a variable\\
+\texttt{get\_values}&                 Return values found by the previous call to ``solve()``\\
+\texttt{is\_binary}&                  Tests whether the variable is a binary\\
+\texttt{is\_integer}&                 Tests whether the variable is an integer\\
+\texttt{is\_real}&                    Tests whether the variable is a real\\
+\texttt{linear\_constraints\_parent}&  Return the parent for all linear constraints\\
+\texttt{linear\_function}&            Construct a new linear function\\
+\texttt{linear\_functions\_parent}&    Return the parent for all linear functions\\
+\texttt{new\_variable}&               Returns an instance of ``MIPVariable`` associated\\
+\texttt{number\_of\_constraints}&      Returns the number of constraints assigned so far\\
+\texttt{number\_of\_variables}&        Returns the number of variables used so far\\
+\texttt{polyhedron}&                 Returns the polyhedron defined by the Linear Program\\
+\texttt{remove\_constraint}&          Removes a constraint from self\\
+\texttt{remove\_constraints}&         Remove several constraints\\
+\texttt{set\_binary}&                 Sets a variable or a ``MIPVariable`` as binary\\
+\texttt{set\_integer}&                Sets a variable or a ``MIPVariable`` as integer\\
+\texttt{set\_max}&                    Sets the maximum value of a variable\\
+\texttt{set\_min}&                    Sets the minimum value of a variable\\
+\texttt{set\_objective}&              Sets the objective of the ``MixedIntegerLinearProgram``\\
+\texttt{set\_problem\_name}&           Sets the name of the ``MixedIntegerLinearProgram``\\
+\texttt{set\_real}&                   Sets a variable or a ``MIPVariable`` as real\\
+\texttt{show}&                       Prints ``MixedIntegerLinearProgram`` in a human-readable\\
+\texttt{solve}&                      Solves the ``MixedIntegerLinearProgram``\\
+\texttt{solver\_parameter}&           Return or define a solver parameter\\
+\texttt{sum}&                         Sums the sequence of LinearFunction elements\\
+\texttt{write\_lp}&                   Write the linear program as a LP file\\
+\texttt{write\_mps}&                  Write the linear program as a MPS file\\
+    \hline
+  \end{tabular}
+\end{center}
+\end{table}
+
+It is important to understand the structure of the MILP class in order to write a working backend that talks properly to the MILP class. 
+
+
+
+\subsection{The GenericBackend class}
+The GenericBackend is a parent class to all linear solver backends. The MILP class creates an instance of the GenericBackend. Since all the backends inherits the GenericBackend, the GenericBackend serves as an interface, that is, it basically lists the methods that should be defined by an LP Solver, in our case the CVXOPT solver. Almost all the methods of the GenericBackend immediately raise ``NotImplementedError`` exceptions when called, and are obviously meant to be replaced by the solver-specific method. Let us look at table \ref{table:generic} for a list of all the methods that return ``NotImplementedError``. Remember, since the CVXOPT backend will inherit the GenericBackend, this is also a list of all the methods we need to implement for the CVXOPT backend.
+
+ To be clear, when we talk about ``the matrix``, columns or rows, we are referring to the matrix $A$ in Chapter \ref{lp}.
+
+\begin{table}
+    \caption{GenericBackend's / CVXOPT's methods table}
+\label{table:generic}
+
+\begin{center}
+  \begin{tabular}{ | l |  l |}
+    \hline
+Function name& Description of its functionality\\
+    \hline    
+\texttt{add\_variable}&              Adds a new variable \\ 
+\texttt{add\_variables}&             Adds several new variables \\ 
+\texttt{set\_variable\_type}&        Defines the variable's type (binary, integer or cont.) \\ 
+\texttt{objective\_coefficient}&     Sets or gets the coefficient of a variable in the objective\\
+\texttt{set\_objective}&             Sets the whole objective\\  
+\texttt{set\_verbosity}&             Sets the log level\\
+\texttt{add\_linear\_constraint}&    Adds a linear constraint \\
+\texttt{add\_col}&                   Adds a column to the matrix \\  
+\texttt{add\_linear\_constraints}&   Adds several linear constraints \\ 
+\texttt{solve}&      			     Solves the problem \\
+\texttt{get\_objective\_value}&      Returns the value of the objective function \\ 
+\texttt{get\_variable\_value}&       Returns the value of a variable given by the solver.  \\ 
+\texttt{ncols}&                      Returns the number of columns  \\ 
+\texttt{nrows}&                      Returns the number of rows \\ 
+\texttt{is\_maximization}&           Returns true if we are maximizing the objective function \\ 
+\texttt{problem\_name}&              Returns or defines the problem's name\\ 
+\texttt{row}&                        Returns a row from the matrix by index\\ 
+\texttt{row\_bounds}&                Returns a pair (lower\_bound,upper\_bound) for a row\\ 
+\texttt{column\_bounds}&             Returns a pair (lower\_bound,upper\_bound) for a column\\ 
+\texttt{is\_variable\_binary}&       Returns if True if variable is a binary\\  
+\texttt{is\_variable\_integer}&      Returns if True if variable is an integer\\ 
+\texttt{is\_variable\_continuou}s&   Returns if True if variable is continuous\\  
+\texttt{row\_name}&    				 Returns the name of the row called\\
+\texttt{column\_name}&    		     Returns the name of the column called\\  
+\texttt{variable\_upper\_bound}&     Returns or define the upper bound on a variable\\  
+\texttt{variable\_lower\_bound}&     Returns or define the lower bound on a variable\\  
+\texttt{solver\_parameter}&          Returns or define a solver parameter\\  
+    \hline
+  \end{tabular}
+\end{center}
+\end{table}
+
+
+
+It is worth to mention that The GenericBackend has the method
+\begin{verbatim}
+GenericBackend get_solver(constraint_generation = False, solver = None)
+\end{verbatim}
+which is used by the MILP class to get a instance of the solver being used.
+
+
+
+
+\section{The Implementation of the CVXOPT LP backend}
+The final implementation of the CVXOPT backend was one class, exactly 999 lines, fully documented and unit tested, capable of solving a linear program as described in chapter \ref{lp}. 
+
+The MILP class (see table \ref{table:mip}) requires you to define each variable as binary, integer or real. Since the CVXOPT library only operates on real numbers, we implemented the methods for CVXOPT backend with that in mind. For instance, \texttt{is\_variable\_binary()} simply returns False since we can assume that all the variables for CVXOPT backend operates on real numbers. 
+
+
+\subsection{Cython}
+\label{cython}
+The class was written in Cython, the same language as the other backends were written in.  Cython combines the power of C and Python and lets you write Python code that calls natively back and forth from and to C code. Not only does Cython therefore extend Python by making it possible to call  C functions, without the need for a lot of boilerplate code, but we can also utilize the efficiency of C when we need to make some of the more demanding computation as fast as possible. This is vital when writing a solver's backend where time is of the essence \cite{cython}.
+
+
+
+\subsection{Class variables and the constructor}
+The following code shows the class variables as well as their initializations in the constructor of the CVXOPT backend:
+
+\begin{verbatim}
+        self.objective_function = [] #c_matrix in the example for cvxopt
+        self.G_matrix = []
+        self.prob_name = None
+        self.obj_constant_term = 0
+        self.is_maximize = 1
+
+        self.row_lower_bound = []
+        self.row_upper_bound = []
+        self.col_lower_bound = []
+        self.col_upper_bound = []
+
+        self.row_name_var = []
+        self.col_name_var = []
+
+        self.param = {"show_progress":False,
+                      "maxiters":100,
+                      "abstol":1e-7,
+                      "reltol":1e-6,
+                      "feastol":1e-7,
+                      "refinement":0 }
+
+        if maximization:
+            self.set_sense(+1)
+        else:
+            self.set_sense(-1)
+\end{verbatim}
+Notice that the \texttt{G\_matrix} is basically the $A$ matrix from chapter \ref{lp} with the $-b$ matrix appended. The \texttt{obj\_constant\_term} is the constant term for the objective\_function and all the col and row bounds are used to bound constraints and variables. Notice however that they can be implemented in the \texttt{G\_matrix} variable and were mostly added for convenience. 
+
+At last, we can see we added the default values for the algorithm parameters, as described in Chapter \ref{algopara}.
+
+
+\subsection{The implementation of several major methods}
+The CVXOPT backend consisted of 27 methods as can be seen in Table \ref{table:generic} and here are few of the more complicated methods shown.
+
+
+\subsubsection{The implementation of \texttt{add\_linear\_constraint}}
+Let us look at the code for the method \texttt{add\_linear\_constraint()}
+\begin{verbatim}
+cpdef add_linear_constraint(self, coefficients, lower_bound,
+			 upper_bound, name=None):
+    for c in coefficients:
+        while c[0] > len(self.G_matrix)-1:
+            self.add_variable()             
+    for i in range(len(self.G_matrix)): 
+        self.G_matrix[i].append(0.0)    
+    for c in coefficients:
+        self.G_matrix[c[0]][-1] = c[1]  
+  
+    self.row_lower_bound.append(lower_bound)
+    self.row_upper_bound.append(upper_bound)
+    self.row_name_var.append(name) 
+\end{verbatim}
+
+First of all, it was important to understand how the MILP class sent the list of coefficients $c$. It came as pairs of $(i,v)$ where $i$ was the index and $v$ was the value of the coefficient for that variable. First we add as many variables as needed. Then we create a zero row in \texttt{G\_matrix} that is a constraint that only consists of coefficients with value 0.0. Finally we add the relevant value from $c$ to the corresponding row in the \texttt{G\_matrix}. 
+
+
+
+
+
+
+\subsubsection{The implementation of \texttt{solve()}}
+\label{impsolve}
+Let us look at the code for the method \texttt{solve()}
+\begin{verbatim}
+    cpdef int solve(self) except -1:
+        from cvxopt import matrix, solvers
+        h = []
+
+        #for the equation bounds
+        for eq_index in range(self.nrows()):
+            h.append(self.row_upper_bound[eq_index])
+            #upper bound is already in G
+            if self.row_lower_bound[eq_index] != None:
+                h.append(-1 * self.row_lower_bound[eq_index])
+                for cindex in range(len(self.G_matrix)):
+                    if cindex == eq_index:
+                        # after multiplying the eq by -1
+                        self.G_matrix[cindex].append(-1) 
+                    else:
+                        self.G_matrix[cindex].append(0)
+
+
+
+        #for the upper bounds (if there are any)
+        for i in range(len(self.col_upper_bound)):
+            if self.col_upper_bound[i] != None:
+                h.append(self.col_upper_bound[i])
+                for cindex in range(len(self.G_matrix)):
+                    if cindex == i:
+                        self.G_matrix[cindex].append(1)
+                    else:
+                        self.G_matrix[cindex].append(0)
+            if self.col_lower_bound[i] != None:
+                h.append(self.col_lower_bound[i])
+                for cindex in range(len(self.G_matrix)):
+                    if cindex == i:
+                        # after multiplying the eq by -1
+                        self.G_matrix[cindex].append(-1) 
+                    else:
+                        self.G_matrix[cindex].append(0)
+
+        G = []
+        for col in self.G_matrix:
+            tempcol = []
+            for i in range(len(col)):
+                tempcol.append( float(col[i]) )
+            G.append(tempcol)
+
+        G = matrix(G)
+
+        #cvxopt minimizes on default
+        if self.is_maximize:
+            c = [-1 * float(e) for e in self.objective_function]
+        else:
+            c = [float(e) for e in self.objective_function]
+        c = matrix(c)
+
+        h = [float(e) for e in h]
+        h = matrix(h)
+
+        #solvers comes from the cvxopt library
+        for k,v in self.param.iteritems():
+            solvers.options[k] = v
+        self.answer = solvers.lp(c,G,h)
+
+        #possible outcomes
+        if self.answer['status'] == 'optimized':
+            pass
+        elif self.answer['status'] == 'primal infeasible':
+            raise MIPSolverException("CVXOPT: primal infeasible")
+        elif self.answer['status'] == 'dual infeasible':
+            raise MIPSolverException("CVXOPT: dual infeasible")
+        elif self.answer['status'] == 'unknown':
+            raise MIPSolverException("CVXOPT: Terminated early due to \
+             numerical difficulties or because the maximum number of \
+             iterations was reached.")
+        return 0
+ 
+\end{verbatim}
+
+The \texttt{solve()} method is definitely the most important method of the CVXOPT class. The purpose of this method is to first, take the values from the bounds and add it to the \texttt{G\_matrix} as well as to the $h$ variable which represents the $h$ in chapter \ref{algopara}. Next we go through the \texttt{G\_matrix}, convert it to float type which the matrix from cvxopt package can understand, and then convert the list $G$ to $G$ of type cvxopt.matrix. We multiply the elements of $c$ by -1 if we want to maximize since the cvxopt minimizes the objectives by default. Finally we add the solve parameters, call the \texttt{solvers.lp} from the cvxopt package and handle the errors as shown above (see chapter \ref{outcomes}). 
+
+\subsubsection{The implementation of \texttt{get\_objective\_value}}
+First let us look at the code for the method \texttt{get\_objective\_value()}
+\begin{verbatim}
+    cpdef get_objective_value(self):
+        sum = self.obj_constant_term
+        i = 0
+        for v in self.objective_function:
+            sum += v * float(self.answer['x'][i])
+            i+=1
+        return sum
+\end{verbatim}
+
+Here we calculate the \texttt{objetive\_value} by going through the values, already calculated by the solve method, multiply it with the coefficient of the \texttt{objective\_function} and add it to the sum. This is the method \texttt{mip.solve()} calls to get the desired value. 
+
+
+\subsubsection{The implementation and design of \texttt{ncols()} and \texttt{nrows()}}
+
+We decided not to use the \texttt{G\_matrix} variable to define the \texttt{ncols()} and \texttt{nrows()} since we will run into troubles when  \texttt{G\_matrix} is small or empty. \texttt{ncols()} was therefore implemented by computing the length of the \texttt{objective\_function} list since every time we call \texttt{add\_variable()} in the backend, we add an integer (the coefficient) to the \texttt{objective\_function} list (worst case scenario, if that variable is not part of the objective function, we add 0.0 to that list. Thus  \texttt{ncols()} returns the correct value. 
+
+The \texttt{nrow()} was simply implemented by computing the number of elements in the \texttt{row\_upper\_bounds} list.
+
+
+
+
+\subsection{Documentation and Testing}
+
+Each and every method in the CVXOPT backend was thoroughly tested and documented. The class passed all the 202 unit test written and contained 720 lines of unit tests, examples and documentation in total. These tests greatly improve the stability of the product and ensured that the code meets its design and behaves as intended.   
+
+
+
+\section{Results}
+As was mention above, the CVXOPT backend final version was a 999 line linear program solver, capable of solving various different kind of linear programs. The backend was designed and implemented under strict object oriented principles, fully tested and documented.
+
+\subsection{Benchmark}
+To make sure this backend wouldn't slow down the solving process a lot, we ran some benchmarks using the built-in \%\%timeit function. We took a very simple linear program to be solved and here is the results.
+
+\begin{verbatim}
+sage: %%timeit -p 4
+sage: p = MixedIntegerLinearProgram(solver="cvxopt")
+sage: v = p.new_variable(real=True, nonnegative=True)
+sage: x, y, z = v['x'], v['y'], v['z']
+sage: p.set_objective(x + y + 3*z)
+sage: p.add_constraint(x + 2*y <= 4)
+sage: p.add_constraint(5*z - y <= 8)
+sage: round(p.solve(), 2)
+1000 loops, best of 3: 1.556 ms per loop
+\end{verbatim}
+
+and when we ran the same code using only the cvxopt library to solve the same problem, we got:
+
+\begin{verbatim}
+%%timeit -p 4 
+sage: from cvxopt import matrix, solvers
+sage: c = matrix([-1., -1.,-3.])
+sage: G = matrix([[1., 0.,-1.,0.,0.], [2., -1.,0.,-1.,0.],[0.,5.,0.,0.,-1.]])
+sage: h = matrix([4., 8.,0.,0.,0.])
+sage: sol = solvers.lp(c, G, h)
+sage: float(sol['x'][0])+float(sol['x'][1])+3*float(sol['x'][2])
+1000 loops, best of 3: 1.232 ms per loop
+\end{verbatim}
+
+As we can see, the one using the backend was $1.556 - 1.232 = 0.324$ms slower than using the cvxopt library straight away. Hence, using the backend to solve a small LP slows down the process by approximately $\frac{1.556 - 1.232}{1.232} \approx 26.3\%$. That is totally acceptable and expected since we need to recreate the \texttt{G\_matrix} inside the \texttt{cvxopt\_backend.solve()} method.
+
+
+
+\subsection{Current status in the open-source community}
+After writing the backend, a ticked was created in the Sage community where the code was pushed. After several reviews, modifications, fixes and improvements on the backend, it got a positive review. The 26th of June, the ticket was closed. We can thus expect to see the backend in the next release of Sage, version 6.4 \cite{ticketlp}.
+
+
+
+
+
+

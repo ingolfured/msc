@@ -1,0 +1,98 @@
+% Chapter 1
+
+\chapter{Introduction} % Main chapter title
+
+\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
+
+\lhead{Chapter 1. Introduction} % This is for the header on each page - perhaps a shortened title
+
+%----------------------------------------------------------------------------------------
+
+\section{Intoduction}
+The aim of the project is to design and implement a Semidefinite Programming (usually abbreviated SDP)  interface for Sagemath \cite{sagepress}, known as Sage, so that Sage can deal with optimization problems with polynomial constraints, using SDP relaxations. The project started with theoretical reading and preparation, followed by an implementation of a linear programming backend, cvxopt \cite{cvxopthome}. Finally the SDP interface was implemented along the cvxopt-sdp solver backend, thus making a sizeable contribution towards the final aim, as well as bringing new functionality. 
+
+
+
+\section{The importance of an SDP interface}
+Nowadays, users who want to solve an SDP, using Sage, have to express the problem in a very restrictive standard form which is required by the solvers, rather than in a natural way that follows mathematical conventions.  
+ Also, the user would have to know how to formulate the problem for each solver. Not to mention the inefficient way of reading and writing to a file which requires the user to write a script which creates a lot of problems.
+ Thus it is important to have an interface so the user doesn't have to have a comprehensive understanding on how each solver works. By creating a Semidefinite Programming interface, this would be achieved. 
+	
+	Matlab \cite{matlab} is without a doubt the most famous alternative to Sage. Matlab has few interfaces that are capable of solving an SDP.  The two most prominent packages to solve an SDP using Matlab are \texttt{YALMIP} \cite{yalmip} and \texttt{CVX} \cite{cvx}.
+
+ 
+
+
+
+\section{Sagemath}
+\label{sage}
+Sage is a open-source mathematics software which builds on top of many existing open-source packages and libraries.``William Stein started the Sage project in 2004 and still leads the project. His frustration with proprietary mathematical software was his main motivation to create a viable open-source alternative. Just as Firefox is an alternative to Internet Explorer or OpenOffice.org is an alternative to Microsoft Office, Sage is a comprehensive open source alternative to Magma, Maple, Mathematica, and Matlab.
+Sage consists of a collection of mathematical software and a core library bundling the functionality of these components into one consistent experience. Additionally to that it provides a framework to express mathematical calculations and a library of mathematical algorithms.
+Mathematics is very old and encompasses many very different topics. It is hard to come up with one unique approach that suites beginners as well as experts. Sage tries to solve this and "is doing remarkably well at keeping a balance between ease-of-use for beginners and high-end users." as David Kohel once said."  \cite{sagepress}. Open-source gives the researcher a possibility to see the code behind the methods, which in many cases can be essential step in, for instance, a mathematical proof. This property, along with the fact that Sage uses a general-purpose popular programming language, Python (unlike Matlab, Mathematica, etc.) makes Sage an easy to use software and thus we focus on developing an easy to use semidefinite programming interface, as this is an essential and valuable by itself step towards the overall project aim.
+
+\section{Linear Programming}
+\label{lp}
+Linear programming (usually abbreviated LP) is a method to maximize or minimize certain value in a mathematical model whose requirements are represented by linear relationships. They can represented in the following form:
+\begin{align}
+\text{Maximize: } &c^{\top}x& \\
+\text{subject to: } &Ax \leq b& \\
+\end{align} 
+
+where $x$ represents the vector of variables to be determined, $c$ and $b$ are vectors of known coefficients, $A$ is a known matrix of coefficients, and the operator $(\cdot)^{\top}$ is the matrix transpose \cite{wikilinear}.
+
+
+
+
+
+\section{Semidefinite Programming}
+\label{sdp}
+SDP is considered among the most powerful tools in the theory and practice of approximation algorithms and methods based on semidefinite programming have been very prominent in optimization since the 1990s. Semidefinite programs can be defined in an equational form:
+
+\begin{align}
+\text{Maximize:} &\sum_{i,j=1}^n c_{ij}x_{ij}\\
+\text{Subject to:} &\sum_{i,j=1}^n a_{ijk}x_{ij} = b_k, \qquad k=1\ldots m\\
+&X \succeq 0	
+\end{align}
+where the $x_{ij}$, $i \leq i,j \leq n$ are $n^2$ variables satisfying the symmetry conditions $x_{ij} = x_{ji}$ for all $i,j$, the $c_{ij}$, $a_{ijk}$ and $b_k$ are real coefficients, and $X$ is positive semidefinite, i.e., all the eigenvalues of $X$ are nonnegative.
+
+The class of SDPs is one of the largest class of optimization problems that is possible to solve efficiently, in practice as well in theory. SDPs play an important role in many research areas, such as approximation algorithms, combinatorial optimization, computational complexity, graph theory, geometry, quantum computing and real algebraic geometry. Thus it is a topic of great interest \cite{yellowbook}.
+
+
+  SDP can be solved efficiently in theory and practice, that is, if one uses an interior point algorithm, 
+  such as the one CVXOPT provides.  This means it can 
+  be solved in time polynomial in the size needed to code its description
+  provided some natural non-degeneracy conditions hold for the input \cite{whitebook}.
+
+
+
+\section{The CVXOPT Library}
+\label{cvxopt}
+CVXOPT is a free software package for convex optimization based on the Python programming language under the GNU v3 licence. It can be integrated in other software via Python extension modules, like Sage for instance. The main purpose of the CVXOPT is to make the development of software for convex optimization as straightforward as possible. It uses the fact that Python has a powerful standard library as well as Python being a high-level programming language. The current version of CVXOPT is at 1.1.7 (released in June 2014). However, we used the previous versions of CVXOPT, namely, version 1.1.6. According to the changelog, the difference between those two version should not affect the SDP or the LP solvers in any way \cite{cvxopthome}.
+
+
+
+\subsection{Algorithm parameters for the CVXOPT solver}
+\label{algopara}
+
+Here we have the list of algorithm control parameters that CVXOPT accepts. They are accessible via the dictionary solvers.options. 
+The following parameters are possible to change:
+
+\begin{description}
+\item[\texttt{show\_progress}]
+    True or False; turns the output to the screen on or off (default: True).
+\item[\texttt{maxiters}]
+    maximum number of iterations (default: 100).
+\item[\texttt{abstol}]
+    absolute accuracy (default: 1e-7).
+\item[\texttt{reltol}]
+    relative accuracy (default: 1e-6).
+\item[\texttt{feastol}]
+    tolerance for feasibility conditions (default: 1e-7).
+\item[\texttt{refinement}]
+    number of iterative refinement steps when solving KKT equations (default: 0 if the problem has no second-order cone or matrix inequality constraints; 1 otherwise) \cite{cvxoptuserpara}.
+\end{description}
+
+
+\subsection{Possible outcomes}
+\label{outcomes}
+After calling any of the methods provided by the \texttt{cvxopt.solvers}, the solver returns a dictionary $d$ which can tell us if the solver successfully managed to approximate a solution. The four possible outcomes are \texttt{'optimal'}, which tells us if the solver successfully managed to come up with a solution. \texttt{'primal infeasible'} or \texttt{'dual infeasible'} tells us that approximate solution wasn't found and finally \texttt{'unknown'}  means the algorithm terminated early due to numerical difficulties or because the maximum number of iterations was reached \cite{cvxoptuser}.

@@ -1,0 +1,433 @@
+% Chapter 3
+
+\chapter{The SDP Interface} % Main chapter title
+
+\label{Chapter3} % For referencing the chapter elsewhere, use \ref{Chapter3} 
+
+\lhead{Chapter 3. The SDP Interface} % This is for the header on each page - perhaps a shortened title
+
+%----------------------------------------------------------------------------------------
+
+\section{Overview}
+For the past fifteen years, SDP has become one of the most exciting developments in mathematical programming. SDP has applications in many different fields traditional convex constrained optimization, control theory, and combinatorial optimization. SDP can be solved using interior-point methods such as the one CVXOPT provides and usually requires about the same amount of computational resources as linear optimization. Hence they can usually be solved fairly efficiently in practice as well as in theory \cite{introsdp}.
+
+Since solving SDP has become such an important topic in the past few years, we believe that creating an easy to use SDP interface with at least one solver in an open-source environment like Sage (\ref{sage}), is a key property for both the users who want to solve certain SDP as well as for other software developers and researchers who want to add new solvers to an unified interface.  
+
+
+
+
+
+
+
+
+\section{The design of the SDP interface}
+\label{designsdp}
+As mention before, the main goal is to design and implement an SDP interface with one solver, capable of solving an SDP.
+
+The first step was to design the process on how the SDP interface should work. Let us give a practical example how we want to solve an SDP (see Chapter \ref{sdp} for the definition of SDPs).
+ 
+Imagine you want to minimize $x_0 - x_1$ where:
+\begin{align}
+\left[\begin{matrix} 1 & 2  \\ 2 & 3  \end{matrix}\right]  x_0 +  \left[\begin{matrix} 3 & 4  \\ 4 & 5  \end{matrix}\right]  x_1 &\preceq   \left[\begin{matrix} 5 & 6  \\ 6 & 7  \end{matrix}\right] \\ 
+\left[\begin{matrix} 1 & 1  \\ 1 & 1  \end{matrix}\right]  x_0 +  \left[ \begin{matrix} 2 & 2  \\ 2 & 2  \end{matrix}\right]  x_1 &\preceq   \left[\begin{matrix} 3 & 3  \\ 3 & 3  \end{matrix}\right] 
+\end{align}
+
+
+where $\forall x_i \in \mathbb{R}^+$.  To solve the SDP above, we decided this would be the process:
+
+\begin{itemize}
+  \item You have to create an instance of \texttt{SemidefiniteProgram}. We
+     add the parameter \texttt{maximization=False} since we want to minimize $x_0 - x_1$.
+
+  \item Create an dictionary $x$ of integer variables $x$ via $x =$
+  \texttt{p.new\_variable()}.
+  \item Add those two inequalities as inequality constraints via
+     \texttt{add\_constraint} 
+     
+     ( \texttt{<sage.numerical.sdp.SemidefiniteProgram.add\_constraint>}.)
+
+  \item Specify the objective function via \texttt{set\_objective}
+  
+   (\texttt{<sage.numerical.sdp.SemidefiniteProgram.set\_objective>}).
+     In our case it is  $x_0 - x_1$. If it
+     is a pure constraint satisfaction problem, specify it as \texttt{None}.
+
+  \item To check if everything is set up correctly, you can print the problem via
+     \texttt{show} (\texttt{<sage.numerical.sdp.SemidefiniteProgram.show>}.)
+
+  \item And finally we call \texttt{Solve} (\texttt{<sage.numerical.sdp.SemidefiniteProgram.solve>}) to solve the SDP and print the
+  solution.
+\end{itemize}
+
+
+The following example shows the desired behaviour:
+\begin{verbatim}
+    sage: p = SemidefiniteProgram(solver = "cvxopt", maximization = False)
+    sage: x = p.new_variable()
+    sage: p.set_objective(x[0] - x[1])
+    sage: a1 = matrix([[1, 2.], [2., 3.]])
+    sage: a2 = matrix([[3, 4.], [4., 5.]])
+    sage: a3 = matrix([[5, 6.], [6., 7.]])
+    sage: b1 = matrix([[1, 1.], [1., 1.]])
+    sage: b2 = matrix([[2, 2.], [2., 2.]])
+    sage: b3 = matrix([[3, 3.], [3., 3.]])
+    sage: p.add_constraint(a1*x[0] + a2*x[1] <= a3)
+    sage: p.add_constraint(b1*x[0] + b2*x[1] <= b3)
+    sage: print 'Objective Value:', round(p.solve(),3)
+    Objective Value: -3.0
+    sage: p.show()
+    Minimization:
+      x_0 - x_1
+    Constraints:
+      constraint_0: [1.0 2.0][2.0 3.0]x_0 + [3.0 4.0][4.0 5.0]x_1 <= 
+           \ [5.0 6.0][6.0 7.0]
+      constraint_1: [1.0 1.0][1.0 1.0]x_0 + [2.0 2.0][2.0 2.0]x_1 <=  
+           \ [3.0 3.0][3.0 3.0]
+    Variables:
+       x_0,  x_1
+\end{verbatim} 
+
+
+
+To accomplish this, we came to the conclusion that we needed to implement the methods listed in Table \ref{table:sdp}.
+The table consists of 15 methods which make it possible for the user to solve an SDP in an easy and efficient way. 
+
+\begin{table}
+    \caption{the SDP methods table}
+\label{table:sdp}
+\begin{center}
+  \begin{tabular}{ | l |  l |}
+    \hline
+Function name& Description of its functionality\\
+    \hline    
+ 
+\texttt{add\_constraint}&              Adds a constraint to the \texttt{SemidefiniteProgram}\\
+\texttt{get\_backend}&                 Returns the backend instance used\\
+\texttt{get\_values}&                  Return values found by the previous call to \texttt{solve()}\\
+\texttt{linear\_constraints\_parent}&  Return the parent for all linear constraints\\
+\texttt{linear\_function}&             Construct a new linear function\\
+\texttt{linear\_functions\_parent}&     Return the parent for all linear functions\\
+\texttt{new\_variable}&                Returns an instance of \texttt{SDPVariable} associated\\
+\texttt{number\_of\_constraints}&      Returns the number of constraints assigned so far\\
+\texttt{number\_of\_variables}&        Returns the number of variables used so far\\
+\texttt{set\_objective}&               Sets the objective of the \texttt{SemidefiniteProgram}\\
+\texttt{set\_problem\_name}&           Sets the name of the \texttt{SemidefiniteProgram}\\
+\texttt{show}&                         \texttt{SemidefiniteProgram} in a human-readable\\
+\texttt{solve}&                        Solves the \texttt{SemidefiniteProgram}\\
+\texttt{solver\_parameter}&            Return or define a solver parameter\\
+\texttt{sum}&                          Sums the sequence of LinearFunction elements\\
+    \hline
+  \end{tabular}
+\end{center}
+\end{table}
+
+
+\section{Solving SDP example using CVXOPT}
+First we look at how the method \texttt{cvxopt.solvers.sdp} takes in its parameters and later we look at an example on how to use the solver to solve a well defined SDP problem. 
+
+
+
+
+\subsection{Parameters for the \texttt{cvxopt.solvers.sdp} method}
+\label{parasdp}
+The \texttt{cvxopt.solvers.sdp(c[, Gl, hl[, Gs, hs[, A, b[, solver[, primalstart[, dualstart]]]]]])} is the method that solves the SDP from chapter \ref{sdp}. The essential parameters we provide are three in total, the $c$, $Gs$ and $hs$. We also took advantage of the parameter \texttt{solver} but more on that later.
+
+The first parameter, $c$, is a list of the coefficients of the objective function. 
+The $Gs$ is a list which has $n$  sub-lists, where $n$ stands for the number of constraints for the SDP. Each sub-list is a flattened out list of type \texttt{cvxopt.matrix} and stands for a single matrix coefficient. 
+The $hs$ is the $b_k$ in section \ref{sdp}.
+
+\subsection{Example}
+\label{sdpexample}
+Let us make an example on how the CVXOPT SDP solver works. Let us say we have the following SDP:
+\begin{align*}
+&\text{Minimize: }  x_1 - x_2 + x_3 \\
+&\text{Subject to: } \nonumber\\
+ &x_1\left[\begin{matrix} -7 & -11  \\ -11 & 3  \end{matrix}\right]  + 
+  x_2\left[\begin{matrix} 7 & -18  \\ -18 & 8  \end{matrix}\right]  +
+   x_3\left[\begin{matrix} -2 & -8  \\ -8 & 1  \end{matrix}\right]    \preceq   \left[\begin{matrix} 33 & -9  \\ -9 & 26  \end{matrix}\right] \\ 
+&x_1\left[\begin{matrix} 21  & -11 &   0 \\  -11 &  10 &   8 \\   0 &   8 & 5 \end{matrix}\right]   +  x_2\left[\begin{matrix}  0  &  10  &  16  \\  10  & -10  & -10\\  16  & -10  & 3 \end{matrix}\right]  + 
+x_3\left[\begin{matrix}  -5  &   2  & -17 \\   2  &  -6  &   8 \\ -17  &  8  & 6 \end{matrix}\right]   &\preceq   \left[\begin{matrix} 14  & 9  & 40 \\ 9  & 91  & 10 \\ 40  & 10  & 15 \end{matrix}\right] 
+\end{align*}
+
+Assuming we have access to the CVXOPT library, we can use the SDP solver of the CVXOPT library to solve this problem above in the following way:
+
+\begin{verbatim}
+>>> from cvxopt import matrix, solvers
+>>> c = matrix([1.,-1.,1.])
+>>> G = [ matrix([[-7., -11., -11., 3.],
+                  [ 7., -18., -18., 8.],
+                  [-2.,  -8.,  -8., 1.]]) ]
+>>> G += [ matrix([[-21., -11.,   0., -11.,  10.,   8.,   0.,   8., 5.],
+                   [  0.,  10.,  16.,  10., -10., -10.,  16., -10., 3.],
+                   [ -5.,   2., -17.,   2.,  -6.,   8., -17.,  8., 6.]]) ]
+>>> h = [ matrix([[33., -9.], [-9., 26.]]) ]
+>>> h += [ matrix([[14., 9., 40.], [9., 91., 10.], [40., 10., 15.]]) ]
+>>> sol = solvers.sdp(c, Gs=G, hs=h)
+>>> print(sol['x'])
+[-3.68e-01]
+[ 1.90e+00]
+[-8.88e-01]
+\end{verbatim} 
+This means the expression $x_1 - x_2 + x_3$ takes the lowest value when $x_1 \approx -0.368$, $x_2 \approx 1.90$ and $x_3 \approx -0.888$ so we get $-0.368 - 1.90 - 0.888 \approx -3.156$ \cite{cvxoptsdp}. 
+
+
+
+
+\section{The implementation of the SDP interface}
+The final implementation consisted of 4 classes, \texttt{SemidefiniteProgram}, \texttt{GenericSDPBackend}, \texttt{CVXOPTSDPBackend} and \texttt{DSDPSDPBackend}. (We also borrowed code from the ticket \texttt{Add a matrix of constraints in a LP} \cite{ticketmatrix}). The four classes we wrote were 2706 lines in total.   
+
+\subsection{The \texttt{SemidefiniteProgram} class}
+The \texttt{SemidefiniteProgram} class was written in Cython (see subsection \ref{cython}) and when finished, was exactly 1342 lines of code.  The code was fully documented with examples, each method was unit tested and comments were added as needed. The class was written with table \ref{table:sdp} in mind.
+
+    The  \texttt{SemidefiniteProgram} class was designed to be a link between Sage, SDP and semidefinite programming solvers. A Semidefinite Programming (SDP) consists of SDP variables, linear tensors on these variables, and an objective function which is to be maximised or minimised under certain constraints. 
+    
+    \subsubsection{The SDPVariable}
+    It was necessary to create a small helper class for the \texttt{SemidefiniteProgram} class. We wrote a class \texttt{SDPVariable} which was to be used in our linear tensor functions. Each instance of \texttt{SDPVariable} was linked with one instance of the \texttt{SemidefiniteProgram}. It also had a variable \texttt{\_name} but more importantly, a variable \texttt{\_dict} which kept the values of the elements a single \texttt{SDPVariable} was capable of creating. This class was written so after an \texttt{SDPVariable} has been created, and we call an element of that variable, it doesn't matter if it exists or not. Let us look at the following example:
+    
+    \begin{verbatim}
+            sage: p = SemidefiniteProgram()
+            sage: v = p.new_variable()
+            sage: p.set_objective(v[0] + v[1])
+            sage: v[0]         
+            x_0  
+    \end{verbatim}
+    
+This shows that the user can call $v[0]$ without initiate it. 
+
+Another very important functionality is the fact we can use matrices as coefficients for a linear function that consists of sum of SDPVariables. This makes it possible to write, for example:
+
+    \begin{verbatim}
+            sage: a = matrix([[1,2],[2,3]])
+            sage: b = matrix([[3,4],[4,5]])
+            sage: p = SemidefiniteProgram()
+            sage: v = p.new_variable()
+            sage: a*v[0] + b*v[1]
+            [x_0 + 3*x_1   2*x_0 + 4*x_1]
+            [2*x_0 + 4*x_1 3*x_0 + 5*x_1]
+            sage: type(a*v[0] + b*v[1])
+            <type 'sage.numerical.linear_tensor_element.LinearTensor'>
+    \end{verbatim}
+
+This makes the interface much more user friendly and helps keeping the process as simple as possible.
+    
+        \subsubsection{The SDPSolverException}
+        A \texttt{SDPSolverException} was also created to handle different outputs from the solvers. Most solvers give some sort of information on how well it did in solving a SDP problem. If the solver doesn't manage to solve a particular SDP, the solver backend is responsible for throwing an \texttt{SDPSolverException} and to give information on what went wrong. For instance, the possible outcomes for the CVXOPT solver are listed in sub-section \ref{outcomes}. 
+
+
+	\subsubsection{Class variables and the constructor}
+	Since the class was designed to be a link between Sage, SDP and semidefinite programming solvers, the most important parameter for the constructor was the name of the solver which was to be used to solve the SDP. 
+	
+	The class has several class variables. However, the most important one was definitely the \texttt{\_backend} variable which was of type \texttt{GenericSDPBackend} (described in \ref{genericsdpbackend}.) This variable is used over and over again to talk to the SDP solver backend. 
+
+Let us now look at the implementation of several important methods.
+
+
+	\subsubsection{Implementation of \texttt{add\_constraint}}
+Here we see the code for the method \texttt{add\_constraint} in the class \texttt{SemidefiniteProgram}:
+\begin{verbatim}
+    def add_constraint(self, linear_function, name=None):
+        if linear_function is 0:        
+            return
+
+        from sage.numerical.linear_tensor_constraints import \
+        		 is_LinearTensorConstraint
+        from sage.numerical.linear_tensor import is_LinearTensor
+
+        if is_LinearTensorConstraint(linear_function) or\
+        		 is_LinearConstraint(linear_function):
+            c = linear_function
+            if c.is_equation():
+                self.add_constraint(c.lhs()-c.rhs(), name=name)
+                self.add_constraint(-c.lhs()+c.rhs(), name=name)
+            else:
+                self.add_constraint(c.lhs()-c.rhs(), name=name)
+
+        elif is_LinearFunction(linear_function) or \
+        	 is_LinearTensor(linear_function):
+            l = linear_function.dict().items()
+            l.sort()
+            self._backend.add_linear_constraint(l, name)
+
+        else:
+            raise ValueError('argument must be a linear function or \
+             constraint, got '+str(linear_function))
+\end{verbatim}
+	
+	The \texttt{add\_constraint} takes in an instance of a linear tensor equation (written \texttt{==}) or inequalities (written \texttt{<=} or \texttt{>=}) where the variables are of type \texttt{SDPVariable} and the coefficients are matrices. An example of this is \texttt{a*x[0] <= b} where $a$ and $b$ are matrices and $x$ is a variable created with the \texttt{SemidefiniteProgram.new\_variable} method. 
+	
+	This function was implemented as a recursive one. If we have an equation, we look at it as two inequalities. In both cases (either the linear tensor constraint is equation or inequality) we move the right hand side to the left hand side to create an instance of a LinearTensor (not LinearTensorConstraint as it was before). Then we create a dictionary and send it to the backend. If we send something else than a LinearTensor (or LinearFunction, to handle some special cases) to  \texttt{add\_constraint}, we raise a \texttt{ValueError}. 
+	
+Notice that we call the \texttt{l.sort()} to make sure it is possible, when implementing a new backend, to iterate through the constrains without worrying about if they come in the right order or not. We can assume the constraint are few enough for the \texttt{sort()} method not to slow down the process. 
+	
+	
+	\subsubsection{Implementation of \texttt{solve}}
+The solve method inside \texttt{SemidefiniteProgram} serves as a wrapper function, calling first the solve method of the backend, and then returning the objective value computed. The code simply became
+\begin{verbatim}
+    def solve(self):
+        self._backend.solve()
+        return self._backend.get_objective_value()
+\end{verbatim}
+
+
+	\subsubsection{Documentation and Testing}
+Each and every method in \texttt{SemidefiniteProgram} was thoroughly tested and documented. The class passed all the 222 unit test written and contained 741 lines of unit tests, examples and documentation in total. These tests greatly improve the stability of the product and ensured that the code meets its design gaols and behaves as intended.   
+
+
+
+\subsection{The \texttt{GenericSDPBackend} class}
+\label{genericsdpbackend}
+The \texttt{GenericSDPBackend} class was written to serve as a superclass for all the backends. That is, when we implement a backend, it should inherit the \texttt{GenericSDPBackend}. This class had to be created since then we can let \texttt{SemidefiniteProgram} class have a variable \texttt{\_backend} of type \texttt{GenericSDPBackend} which simplifies the code dramatically.  
+
+This class lists the methods that should be defined by a backend with an SDP Solver. Most of the methods immediately raise \texttt{NotImplementedError} exceptions when called, and are obviously meant to be replaced by the solver-specific method. However, there are two methods implemented in the class. First it is the \texttt{default\_sdp\_solver} which returns or sets the default SDP solver and then \texttt{get\_solver} which returns the appropriate backend. This class makes it easier to implement more SDP backends in the future.
+
+
+\subsection{The \texttt{CVXOPTSDPBackend} class}
+After we finished writing the \texttt{SemidefiniteProgram} and \texttt{GenericSDPBackend} classes, it was important to have at least one backend solver so these classes could be used in practice. We then decided to implement a backend for the SDP solver, provided by CVXOPT library (see section \ref{cvxopt}). The class \texttt{CVXOPTSDPBackend} was based on the \texttt{CVXOPTBackend} from chapter \ref{Chapter2}. This backend has the same list of methods. However, we had to reimplement most of the methods to make it handle the fact the coefficients were matrices and not real numbers. 
+
+One example of this is the \texttt{add\_linear\_constraint} method. Let us look at the code:
+\begin{verbatim}
+    cpdef add_linear_constraint(self, coefficients, name=None):
+        from sage.matrix.matrix import is_Matrix
+        for t in coefficients:
+            m = t[1]
+            if not is_Matrix(m):
+                raise Exception("The coefficients must be matrices")
+            if not m.is_square():
+                raise Exception("The matrix has to be a square")
+            if self.matrices_dim.get(self.nrows()) != None and \
+           			 m.dimensions()[0] != self.matrices_dim.get(self.nrows()):
+                raise Exception("The matrces have to be of the same dimension")
+        self.coeffs_matrix.append(coefficients)
+        self.matrices_dim[self.nrows()] = m.dimensions()[0] #
+        self.row_name_var.append(name)
+\end{verbatim}
+
+First notice that some error handling is being done to make sure the matrices are as expected. This was important to make sure we couldn't add a broken constraint to the constraint matrix. After that we append the coefficients to the variable \texttt{coeffs\_matrix} which contains all constraints.
+
+
+	\subsubsection{The \texttt{solve()} method}
+	\label{solvecvxoptsdp}
+	As mention before (see Table \ref{table:generic}), the backend contains the solve method, responsible for solving the SDP. This function is in some sense similar to the \texttt{solve()} for the Linear CVXOPT backend, described in \ref{impsolve}. One major difference though is that we utilize the fact CVXOPT offers to use more than its default solver. Therefore we get an additional solver for almost free by adding this code to the  \texttt{solve()} method:
+	\begin{verbatim}
+        ...
+        if self.solver == "DSDP":
+            self.answer = solvers.sdp(c,Gs=G_matrix,hs=h_matrix,solver="dsdp")
+        else:
+            self.answer = solvers.sdp(c,Gs=G_matrix,hs=h_matrix)
+        ...
+    \end{verbatim}	 
+ 
+This will be explained in more detail in Subsection \ref{dsdp}.
+
+	\subsubsection{Documentation and Testing}
+	All the methods were thoroughly tested and documented. The class passed all the 147 unit test written and it contained 441 lines of unit tests, examples and documentation in total. 
+
+	
+	
+
+\subsection{The \texttt{DSDPSDPBackend} class}
+\label{dsdp}
+As mentioned in \ref{solvecvxoptsdp}, we took advantage of the fact that the default CVXOPT SDP solver can easily be changed to an external one called DSDP. This can be accomplished  by putting a solver parameter into the solve function described in Subsection \ref{parasdp}. This gives the user the ability to choose among two solvers which can be essential in practice as well as in academic research.
+
+\subsubsection{The DSDP solver}
+The DSDP solver is as well an interior-point solver and can in some cases be more appropriate to use than the CVXOPT solver. The DSDP version 5 was released in 2005 and is described by the author in the following way: 
+
+
+"Initiated in 1997, DSDP has developed into an efficient and
+robust general-purpose solver for semidefinite programming. Its features include a convergence
+proof with polynomially bounded worst-case complexity, primal and dual feasible solutions when
+they exist, certificates of infeasibility when solutions do not exist, initial points that can be feasible
+or infeasible, relatively low memory requirements for an interior-point method, sparse and low-
+rank data structures, extensibility that allows applications to customize the solver and improve
+its performance, a subroutine library that enables it to be linked to larger applications, scalable
+performance for large problems on parallel architectures, and a well-documented interface and
+examples of its use. The package has been used in many applications and tested for efficiency,
+robustness, and ease of use" \cite{dsdp5}.
+
+The DSDP solver is however, not a part of Sage. Thus it is important that the CVXOPT library is built with a DSDP support as well as the DSDP will be added to Sage. 
+
+\subsubsection{The DSDP backend}
+Due to the fact we implemented the CVXOPT with the possibility to switch between solvers, we only needed to implement one method in the \texttt{DSDPSDPBackend} which returns a modified version of the CVXOPT backend. Therefore it is sufficient to have:
+
+\begin{verbatim}
+    def return_modified_cvxopt(self):
+        return CVXOPTSDPBackend(solver = "dsdp")
+\end{verbatim}
+and then the \texttt{GenericSDPBackend} calls this method when the user asks for the DSDP solver.
+
+To use the DSDP solver to solve an SDP, the user would follow the same routine as in section \ref{designsdp}. However, we would change  
+\begin{verbatim}
+sage: p = SemidefiniteProgram(solver = "cvxopt", maximization = False)
+...
+\end{verbatim}
+to
+\begin{verbatim}
+sage: p = SemidefiniteProgram(solver = "dsdp", maximization = False)
+...
+\end{verbatim}
+
+This is the ideal way for the user to switch between solvers.
+
+
+
+
+
+
+\section{Results}
+The final version of the SDP interface was, as mention above, 4 fully tested classes, capable of solving various different kinds of SDP with at least two independent solvers. Future developers should find it easy to add new backends for other SDP solvers since the interface was clearly built with a good separation between the interface and the backends.
+
+We believe all the problems we encountered on the way were solved. Not only did we implement an easy to use SDP interface as the goal was, but we also made it so the user now has the freedom to choose between two different solvers.   
+
+
+	\subsection{Benchmark}
+	Again we ran a benchmark using the \texttt{\%\%timeit} function, to make sure neither the interface nor the backend would slow down the solving process a lot. We chose a simple SDP to be solved and here are the results:
+	
+	
+\begin{verbatim}
+sage: %%timeit -p 4
+sage: p = SemidefiniteProgram(solver = "cvxopt", maximization=False)
+sage: x = p.new_variable()
+sage: p.set_objective(x[0] - x[1] + x[2])
+sage: a1 = matrix([[-7., -11.], [-11., 3.]])
+sage: a2 = matrix([[7., -18.], [-18., 8.]])
+sage: a3 = matrix([[-2., -8.], [-8., 1.]])
+sage: a4 = matrix([[33., -9.], [-9., 26.]])
+sage: b1 = matrix([[-21., -11., 0.], [-11., 10., 8.], [0.,   8., 5.]])
+sage: b2 = matrix([[0.,  10.,  16.], [10., -10., -10.], [16., -10., 3.]])
+sage: b3 = matrix([[-5.,   2., -17.], [2.,  -6.,   8.], [-17.,  8., 6.]])
+sage: b4 = matrix([[14., 9., 40.], [9., 91., 10.], [40., 10., 15.]])
+sage: p.add_constraint(a1*x[0] + a2*x[1] + a3*x[2] <= a4)
+sage: p.add_constraint(b1*x[0] + b2*x[1] + b3*x[2] <= b4)
+sage: p.solve()
+100 loops, best of 3: 5.604 ms per loop
+\end{verbatim}
+
+and when we ran the same code using only the cvxopt library to solve the same problem, we got:
+
+\begin{verbatim}
+sage: %%timeit -p 4 
+sage: from cvxopt import matrix, solvers
+sage: solvers.options["show_progress"] = False
+sage: c = matrix([1.,-1.,1.])
+sage: G = [ matrix([[-7., -11., -11., 3.],
+                  [ 7., -18., -18., 8.],
+                  [-2.,  -8.,  -8., 1.]]) ]
+sage: G += [ matrix([[-21., -11.,   0., -11.,  10.,   8.,   0.,   8., 5.],
+                   [  0.,  10.,  16.,  10., -10., -10.,  16., -10., 3.],
+                   [ -5.,   2., -17.,   2.,  -6.,   8., -17.,  8., 6.]]) ]
+sage: h = [ matrix([[33., -9.], [-9., 26.]]) ]
+sage: h += [ matrix([[14., 9., 40.], [9., 91., 10.], [40., 10., 15.]]) ]
+sage: sol = solvers.sdp(c, Gs=G, hs=h)
+sage: float(sol['x'][0])-float(sol['x'][1])+float(sol['x'][2])
+100 loops, best of 3: 4.524 ms per loop
+\end{verbatim} 
+
+We can see that when we use the backend, we are $5.604 - 4.524 = 1.080$ms slower than using the cvxopt library directly. Thus, when we are solving a small SDP, it slows down the process by approximately 
+$\frac{5.604 - 4.524}{4.524} \approx 23.9\%$. Again, this is more than acceptable and expected since extra computation is needed when using the SDP interface. 
+
+Notice however that when we pick a larger SDP, the percentage should get closer to zero since then the main effort goes into solving the actual SDP instead of formulating it so the backend understands it.
+
+
+	\subsection{Current status in the open-source community}
+
+	\subsection{Future work}

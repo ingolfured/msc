@@ -1,0 +1,65 @@
+\contentsline {chapter}{Abstract}{1}{dummy.1}
+\vspace {1em}
+\contentsline {chapter}{Acknowledgements}{2}{dummy.2}
+\vspace {1em}
+\contentsline {chapter}{Contents}{3}{dummy.3}
+\contentsline {chapter}{List of Tables}{5}{dummy.5}
+\contentsline {chapter}{\numberline {1}Introduction}{6}{chapter.7}
+\contentsline {section}{\numberline {1.1}Intoduction}{6}{section.8}
+\contentsline {section}{\numberline {1.2}The importance of an SDP interface}{6}{section.9}
+\contentsline {section}{\numberline {1.3}Sagemath}{7}{section.10}
+\contentsline {section}{\numberline {1.4}Linear Programming}{7}{section.11}
+\contentsline {section}{\numberline {1.5}Semidefinite Programming}{8}{section.15}
+\contentsline {section}{\numberline {1.6}The CVXOPT Library}{8}{section.19}
+\contentsline {subsection}{\numberline {1.6.1}Algorithm parameters for the CVXOPT solver}{9}{subsection.20}
+\contentsline {subsection}{\numberline {1.6.2}Possible outcomes}{9}{subsection.21}
+\contentsline {chapter}{\numberline {2}The CVXOPT LP Backend}{10}{chapter.22}
+\contentsline {section}{\numberline {2.1}Overview}{10}{section.23}
+\contentsline {section}{\numberline {2.2}Solving linear Programs in Sage}{10}{section.24}
+\contentsline {section}{\numberline {2.3}LP example using CVXOPT}{11}{section.29}
+\contentsline {section}{\numberline {2.4}The importance of the CVXOPT solver}{12}{section.34}
+\contentsline {subsection}{\numberline {2.4.1}The difference between the Simplex method and interior point method}{12}{subsection.35}
+\contentsline {section}{\numberline {2.5}Parameters for the \texttt {cvxopt.solvers.lp} method}{14}{section.41}
+\contentsline {section}{\numberline {2.6}Important classes for the CVXOPT backend}{14}{section.42}
+\contentsline {subsection}{\numberline {2.6.1}The MixedIntegerLinearProgram class}{14}{subsection.43}
+\contentsline {subsection}{\numberline {2.6.2}The GenericBackend class}{16}{subsection.45}
+\contentsline {section}{\numberline {2.7}The Implementation of the CVXOPT LP backend}{17}{section.47}
+\contentsline {subsection}{\numberline {2.7.1}Cython}{17}{subsection.48}
+\contentsline {subsection}{\numberline {2.7.2}Class variables and the constructor}{17}{subsection.49}
+\contentsline {subsection}{\numberline {2.7.3}The implementation of several major methods}{18}{subsection.50}
+\contentsline {subsubsection}{\numberline {2.7.3.1}The implementation of \texttt {add\_linear\_constraint}}{18}{subsubsection.51}
+\contentsline {subsubsection}{\numberline {2.7.3.2}The implementation of \texttt {solve()}}{19}{subsubsection.52}
+\contentsline {subsubsection}{\numberline {2.7.3.3}The implementation of \texttt {get\_objective\_value}}{21}{subsubsection.53}
+\contentsline {subsubsection}{\numberline {2.7.3.4}The implementation and design of \texttt {ncols()} and \texttt {nrows()}}{22}{subsubsection.54}
+\contentsline {subsection}{\numberline {2.7.4}Documentation and Testing}{22}{subsection.55}
+\contentsline {section}{\numberline {2.8}Results}{22}{section.56}
+\contentsline {subsection}{\numberline {2.8.1}Benchmark}{22}{subsection.57}
+\contentsline {subsection}{\numberline {2.8.2}Current status in the open-source community}{23}{subsection.58}
+\contentsline {chapter}{\numberline {3}The SDP Interface}{24}{chapter.59}
+\contentsline {section}{\numberline {3.1}Overview}{24}{section.60}
+\contentsline {section}{\numberline {3.2}The design of the SDP interface}{24}{section.61}
+\contentsline {section}{\numberline {3.3}Solving SDP example using CVXOPT}{26}{section.65}
+\contentsline {subsection}{\numberline {3.3.1}Parameters for the \texttt {cvxopt.solvers.sdp} method}{27}{subsection.66}
+\contentsline {subsection}{\numberline {3.3.2}Example}{27}{subsection.67}
+\contentsline {section}{\numberline {3.4}The implementation of the SDP interface}{28}{section.68}
+\contentsline {subsection}{\numberline {3.4.1}The \texttt {SemidefiniteProgram} class}{28}{subsection.69}
+\contentsline {subsubsection}{\numberline {3.4.1.1}The SDPVariable}{28}{subsubsection.70}
+\contentsline {subsubsection}{\numberline {3.4.1.2}The SDPSolverException}{29}{subsubsection.71}
+\contentsline {subsubsection}{\numberline {3.4.1.3}Class variables and the constructor}{30}{subsubsection.72}
+\contentsline {subsubsection}{\numberline {3.4.1.4}Implementation of \texttt {add\_constraint}}{30}{subsubsection.73}
+\contentsline {subsubsection}{\numberline {3.4.1.5}Implementation of \texttt {solve}}{31}{subsubsection.74}
+\contentsline {subsubsection}{\numberline {3.4.1.6}Documentation and Testing}{31}{subsubsection.75}
+\contentsline {subsection}{\numberline {3.4.2}The \texttt {GenericSDPBackend} class}{32}{subsection.76}
+\contentsline {subsection}{\numberline {3.4.3}The \texttt {CVXOPTSDPBackend} class}{32}{subsection.77}
+\contentsline {subsubsection}{\numberline {3.4.3.1}The \texttt {solve()} method}{33}{subsubsection.78}
+\contentsline {subsubsection}{\numberline {3.4.3.2}Documentation and Testing}{33}{subsubsection.79}
+\contentsline {subsection}{\numberline {3.4.4}The \texttt {DSDPSDPBackend} class}{33}{subsection.80}
+\contentsline {subsubsection}{\numberline {3.4.4.1}The DSDP solver}{34}{subsubsection.81}
+\contentsline {subsubsection}{\numberline {3.4.4.2}The DSDP backend}{34}{subsubsection.82}
+\contentsline {section}{\numberline {3.5}Results}{35}{section.83}
+\contentsline {subsection}{\numberline {3.5.1}Benchmark}{35}{subsection.84}
+\contentsline {subsection}{\numberline {3.5.2}Current status in the open-source community}{36}{subsection.85}
+\contentsline {subsection}{\numberline {3.5.3}Future work}{36}{subsection.86}
+\vspace {2em}
+\vspace {2em}
+\contentsline {chapter}{Bibliography}{37}{dummy.87}

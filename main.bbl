@@ -1,0 +1,117 @@
+\begin{thebibliography}{19}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[sag()]{sagepress}
+Sage - press - about.
+\newblock \url{http://www.sagemath.org/library-press.html}.
+\newblock [Online; accessed 10-August-2014].
+
+\bibitem[cvx({\natexlab{a}})]{cvxopthome}
+Home — cvxopt.
+\newblock \url{http://cvxopt.org}, {\natexlab{a}}.
+\newblock [Online; accessed 14-August-2014].
+
+\bibitem[mat()]{matlab}
+{MATLAB - The Language of Technical Computing - MathWorks United Kingdom}.
+\newblock \url{http://www.mathworks.co.uk/products/matlab/}.
+\newblock [Online; accessed 3-September-2014].
+
+\bibitem[yal()]{yalmip}
+{YALMIP Wiki Tutorials/Semidefinite Programming}.
+\newblock
+  \url{http://users.isy.liu.se/johanl/yalmip/pmwiki.php?n=Tutorials.SemidefiniteProgramming}.
+\newblock [Online; accessed 3-September-2014].
+
+\bibitem[cvx({\natexlab{b}})]{cvx}
+{Semidefinite programming mode — CVX Users' Guide}.
+\newblock \url{http://web.cvxr.com/cvx/doc/sdp.html}, {\natexlab{b}}.
+\newblock [Online; accessed 3-September-2014].
+
+\bibitem[wik()]{wikilinear}
+Linear programming - {Wikipedia}, the free encyclopedia.
+\newblock \url{http://en.wikipedia.org/wiki/Linear_programming}.
+\newblock [Online; accessed 11-August-2014].
+
+\bibitem[Gärtner and Matousek(2012)]{yellowbook}
+Bernd Gärtner and Jiri Matousek.
+\newblock \emph{Approximation Algorithms and Semidefinite Programming}.
+\newblock Springer, 2012 edition, 1 2012.
+\newblock ISBN 9783642220142.
+
+\bibitem[Lasserre(2009)]{whitebook}
+Jean-Bernard Lasserre.
+\newblock \emph{Moments, Positive Polynomials and Their Applications (Imperial
+  College Press Optimization Series)}.
+\newblock Imperial College Press, 1 edition, 10 2009.
+\newblock ISBN 9781848164451.
+
+\bibitem[cvx({\natexlab{c}})]{cvxoptuserpara}
+Cone programming — cvxopt user's guide.
+\newblock \url{http://cvxopt.org/userguide/coneprog.html#algorithm-parameters},
+  {\natexlab{c}}.
+\newblock [Online; accessed 18-August-2014].
+
+\bibitem[cvx({\natexlab{d}})]{cvxoptuser}
+Cone programming — cvxopt user's guide.
+\newblock \url{http://cvxopt.org/userguide/coneprog.html}, {\natexlab{d}}.
+\newblock [Online; accessed 14-August-2014].
+
+\bibitem[top()]{top10}
+Guest editors' introduction: The top 10 algorithms.
+\newblock \url{http://www.computer.org/csdl/mags/cs/2000/01/c1022.html}.
+\newblock [Online; accessed 13-August-2014].
+
+\bibitem[int()]{interior}
+Interior-point methods for large-scale cone programming.
+\newblock \url{http://www.seas.ucla.edu/~vandenbe/publications/mlbook.pdf}.
+\newblock [Online; accessed 13-August-2014].
+
+\bibitem[Spielman and Teng(2001)]{simplexpoly}
+Daniel Spielman and Shang-Hua Teng.
+\newblock Smoothed analysis of algorithms: Why the simplex algorithm usually
+  takes polynomial time.
+\newblock In \emph{Proceedings of the thirty-third annual ACM symposium on
+  Theory of computing}, pages 296--305. ACM, 2001.
+
+\bibitem[cyt()]{cython}
+Cython: C-extensions for {Python}.
+\newblock \url{http://http://cython.org/}.
+\newblock [Online; accessed 16-August-2014].
+
+\bibitem[tic({\natexlab{a}})]{ticketlp}
+\#16490 (create a linear programming backend for cvxopt) – sage.
+\newblock \url{http://trac.sagemath.org/ticket/16490}, {\natexlab{a}}.
+\newblock [Online; accessed 28-August-2014].
+
+\bibitem[Iwan()]{introsdp}
+Mark Iwan.
+\newblock Introduction to semidefinite programming (sdp).
+\newblock
+  \url{http://www.math.msu.edu/~markiwen/Teaching/MTH995/Papers/SDP_notes_Marina_Epelman_UM.pdf}.
+\newblock [Online; accessed 22-August-2014].
+
+\bibitem[cvx({\natexlab{e}})]{cvxoptsdp}
+Semidefinite programming — cvxopt user's guide.
+\newblock
+  \url{http://cvxopt.org/userguide/coneprog.html#semidefinite-programming},
+  {\natexlab{e}}.
+\newblock [Online; accessed 22-August-2014].
+
+\bibitem[tic({\natexlab{b}})]{ticketmatrix}
+\#16714 (add a matrix of constraints in a lp) – sage.
+\newblock \url{http://trac.sagemath.org/ticket/16714}, {\natexlab{b}}.
+\newblock [Online; accessed 29-August-2014].
+
+\bibitem[Benson and Ye(2005)]{dsdp5}
+Steven~J. Benson and Yinyu Ye.
+\newblock {DSDP5}: Software for semidefinite programming.
+\newblock Technical Report ANL/MCS-P1289-0905, Mathematics and Computer Science
+  Division, Argonne National Laboratory, Argonne, IL, 2005.
+\newblock Submitted to ACM Transactions on Mathematical Software, available
+  \url{http://www.mcs.anl.gov/hs/software/DSDP/DSDP5-P1289-0905.pdf}.
+
+\end{thebibliography}

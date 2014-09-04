@@ -1,0 +1,64 @@
+This is BibTeX, Version 0.99d (TeX Live 2014/Arch Linux)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+The style file: unsrtnat.bst
+Database file #1: Bibliography.bib
+Warning--string name "september" is undefined
+--line 71 of file Bibliography.bib
+Warning--empty year in sagepress
+Warning--empty year in cvxopthome
+Warning--empty year in matlab
+Warning--empty year in yalmip
+Warning--empty year in cvx
+Warning--empty year in wikilinear
+Warning--empty year in cvxoptuserpara
+Warning--empty year in cvxoptuser
+Warning--empty year in top10
+Warning--empty year in interior
+Warning--empty year in cython
+Warning--empty year in ticketlp
+Warning--empty year in introsdp
+Warning--empty year in cvxoptsdp
+Warning--empty year in ticketmatrix
+You've used 19 entries,
+            2481 wiz_defined-function locations,
+            633 strings with 7197 characters,
+and the built_in function-call counts, 4839 in all, are:
+= -- 460
+> -- 59
+< -- 7
++ -- 59
+- -- 16
+* -- 259
+:= -- 582
+add.period$ -- 62
+call.type$ -- 19
+change.case$ -- 38
+chr.to.int$ -- 14
+cite$ -- 48
+duplicate$ -- 294
+empty$ -- 611
+format.name$ -- 27
+if$ -- 1140
+int.to.chr$ -- 6
+int.to.str$ -- 20
+missing$ -- 5
+newline$ -- 107
+num.names$ -- 15
+pop$ -- 268
+preamble$ -- 1
+purify$ -- 19
+quote$ -- 0
+skip$ -- 164
+stack$ -- 0
+substring$ -- 84
+swap$ -- 57
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 127
+warning$ -- 15
+while$ -- 13
+width$ -- 0
+write$ -- 241
+(There were 16 warnings)
