@@ -15,10 +15,11 @@ The aim of the project is to design and implement a Semidefinite Programming (us
 
 \section{The importance of an SDP interface}
 Nowadays, users who want to solve an SDP, using Sage, have to express the problem in a very restrictive standard form which is required by the solvers, rather than in a natural way that follows mathematical conventions.  
- Also, the user would have to know how to formulate the problem for each solver. Not to mention the inefficient way of reading and writing to a file which requires the user to write a script which creates a lot of problems.
- Thus it is important to have an interface so the user doesn't have to have a comprehensive understanding on how each solver works. By creating a Semidefinite Programming interface, this would be achieved. 
+ Also, the user would have to know how to formulate the problem for each solver. Not to mention the inefficient way of reading and writing to a file which requires the user to write a script---creating a lot of problems---for solvers
+ not having a Python interface.
+ Thus it is important to have an interface so the user doesn't have to have a comprehensive understanding on how each solver works. By creating an SDP  interface, this can be achieved. 
 	
-	Matlab \cite{matlab} is without a doubt the most famous alternative to Sage. Matlab has few interfaces that are capable of solving an SDP.  The two most prominent packages to solve an SDP using Matlab are \texttt{YALMIP} \cite{yalmip} and \texttt{CVX} \cite{cvx}.
+As far as numerics is concerned, Matlab \cite{matlab} is without a doubt the most famous alternative to Sage. Matlab has few interfaces that are capable of solving an SDP.  The two most prominent packages to solve an SDP using Matlab are \texttt{YALMIP} \cite{yalmip} and \texttt{CVX} \cite{cvx}.
 
  
 
