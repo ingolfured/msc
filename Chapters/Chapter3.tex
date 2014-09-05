@@ -332,8 +332,8 @@ As mentioned in \ref{solvecvxoptsdp}, we took advantage of the fact that the def
 \subsubsection{The DSDP solver}
 The DSDP solver is as well an interior-point solver and can in some cases be more appropriate to use than the CVXOPT solver. The DSDP version 5 was released in 2005 and is described by the author in the following way: 
 
-
-"Initiated in 1997, DSDP has developed into an efficient and
+\begin{quotation}
+Initiated in 1997, DSDP has developed into an efficient and
 robust general-purpose solver for semidefinite programming. Its features include a convergence
 proof with polynomially bounded worst-case complexity, primal and dual feasible solutions when
 they exist, certificates of infeasibility when solutions do not exist, initial points that can be feasible
@@ -342,7 +342,8 @@ rank data structures, extensibility that allows applications to customize the so
 its performance, a subroutine library that enables it to be linked to larger applications, scalable
 performance for large problems on parallel architectures, and a well-documented interface and
 examples of its use. The package has been used in many applications and tested for efficiency,
-robustness, and ease of use" \cite{dsdp5}.
+robustness, and ease of use \cite{dsdp5}.
+\end{quotation}
 
 The DSDP solver is however, not a part of Sage. Thus it is important that the CVXOPT library is built with a DSDP support as well as the DSDP will be added to Sage. 
 
@@ -429,9 +430,9 @@ Notice however that when we pick a larger SDP, the percentage should get closer 
 
 
 	\subsection{Current status in the open-source community}
-When the implementation was done and the interface, the backends and other classes passed all their unit tests, a ticket was created in the Sage community. The code is currently being reviewed and is under discussion by the members of the community \cite{ticketsdp}.
+When the implementation was done and the interface, the backends and other classes passed all their unit tests, a ticket was created in the Sage developer community portal. The code is currently being reviewed and is under discussion by the members of the community \cite{ticketsdp}.
 	
 
 	\subsection{Future work}
-	
+	We have now taken a major step towards dealing with optimization problems with polynomial constraints by creating an SDP interface for Sage. 
 	

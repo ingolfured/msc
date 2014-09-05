@@ -35,7 +35,8 @@
 \usepackage[square, numbers, comma, sort&compress]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' 
 \hypersetup{urlcolor=blue, colorlinks=true} % Colors hyperlinks in blue - change to black if annoying
 \title{\ttitle} % Defines the thesis title - don't touch this
-
+\usepackage{multibib}
+\newcites{BIB}{Bibliography}
 \begin{document}
 
 %\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
@@ -205,15 +206,29 @@ upcoming release; the remaining code will be merged there in due course, upon pa
 \backmatter
 
 %----------------------------------------------------------------------------------------
-%	BIBLIOGRAPHY
+%	REFERENCES
 %----------------------------------------------------------------------------------------
 
+\label{References}
+
+\lhead{\emph{References}} % Change the page header to say "References"
+
+\bibliographystyle{plain} % Use the "unsrtnat" BibTeX style for formatting the Bibliography
+\renewcommand\bibname{References}
+\bibliography{References} % The references (bibliography) information are stored in the file named "Bibliography.bib"
+
+\clearpage	
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
 \label{Bibliography}
 
-\lhead{\emph{Bibliography}} % Change the page header to say "Bibliography"
+\lhead{\emph{Bibliography}} % Change the page header to say "References"
+\nociteBIB{*}
+\makeatletter\renewcommand{\@biblabel}[1]{[B#1]}\makeatother
+\bibliographystyleBIB{plain} % Use the "unsrtnat" BibTeX style for formatting the Bibliography
+\renewcommand\bibname{Bibliography}
+\bibliographyBIB{Bibliography} % The references (bibliography) information are stored in the file named "Bibliography.bib"
 
-\bibliographystyle{unsrtnat} % Use the "unsrtnat" BibTeX style for formatting the Bibliography
-
-\bibliography{Bibliography} % The references (bibliography) information are stored in the file named "Bibliography.bib"
 
 \end{document}  
