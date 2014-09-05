@@ -24,7 +24,9 @@ Since solving SDP has become such an important topic in the past few years, we b
 \label{designsdp}
 As mention before, the main goal is to design and implement an SDP interface with one solver, capable of solving an SDP.
 
-The first step was to design the process on how the SDP interface should work. Let us give a practical example how we want to solve an SDP (see Chapter \ref{sdp} for the definition of SDPs).
+The first step was to understand how SDP works in general. The courses Foundation of Computer Science and Probability and Computing help tremendously to understand advanced topics in Linear Optimization, such as relaxation of a problem, the well known  MAX-CUT problem (covered in Probability and Computing), the relevant complexity classes (to know  what an SDP solver is capable of and what to avoid) and other topics. This made, for instance, the reading of \cite{yellowbook} feasible. 
+ 
+Next step was to design the process on how the SDP interface should work. Let us give a practical example how we want to solve an SDP (see Chapter \ref{sdp} for the definition of SDPs).
  
 Imagine you want to minimize $x_0 - x_1$ where:
 \begin{align}
@@ -434,8 +436,8 @@ When the implementation was done and the interface, the backends and other class
 	
 
 	\subsection{Future work}
-	We have now taken a major step towards dealing with optimization problems with polynomial constraints by creating an SDP interface for Sage. It would be interesting to using the SDP interface to create a module for sum-of-squares calculations as described here \cite{hol2004sum}. 
+	We have now taken a major step towards dealing with optimization problems with polynomial constraints by creating an SDP interface for Sage. It would be interesting to use the SDP interface to create a module for sum-of-squares calculations as described here \cite{hol2004sum}. 
 
-	Having access to more backends would also be important for the user. Creating backend for another modern solver such as CSDP \cite{borchers1999csdp} would thus give the user more freedom and might speed up the computation time for certain SDP problems. 
+	Having access to more backends would also be helpful if the user wants to try out other solvers. Creating backend for another modern solver such as CSDP \cite{borchers1999csdp} would then give the user more freedom and might speed up the computation time for certain SDP problems. 
 	
 	
